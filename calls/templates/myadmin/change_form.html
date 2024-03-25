@@ -1,0 +1,42 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <!-- Include your AngularJS app scripts -->
+    <script src="{% static 'js/app.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    <script id="change-product-script">
+            $(document).ready(function() {
+        $('select#id_country').on('change', function() {
+            var selectedValue = $(this).val();
+
+            // Simulated AJAX call to fetch options for Select 2 based on Select 1 value
+            // Replace this with your actual AJAX call to fetch data dynamically
+            $.ajax({
+                url: "{% url 'state-list' %}", // Your URL to fetch options based on selectedValue
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var select2 = $('select#id_state');
+                    select2.empty(); // Clear existing options
+                    select2.append($('<option></option>').text('---------'))
+                    // Append new options to Select 2 based on the retrieved data
+                    $.each(data, function(index, option) {
+                        select2.append($('<option></option>').val(option.id).text(option.name));
+                    });
+                },
+                error: function() {
+                    console.log('Error fetching options');
+                }
+            });
+        });
+    });
+    </script>
+{% endblock %}
+{% block submit_buttons_bottom %}{% endblock %}

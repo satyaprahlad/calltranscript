@@ -1,0 +1,185 @@
+<!-- product_list.html -->
+{% extends 'admin/index.html' %}
+{% load static %}
+
+{% block extrastyle %}
+    <!-- Include any additional CSS or styling here -->
+    <link rel="stylesheet" type="text/css" href="{% static 'dummyapp/custom_report_styles.css' %}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Product List - Custom Admin</title>-->
+<!--    &lt;!&ndash; Include Bootstrap CSS &ndash;&gt;-->
+
+<!--</head>-->
+
+{% block content %}
+{% verbatim %}
+<div ng-app="ProductApp" ng-controller="ProductController">
+    <input type="text" ng-model="searchText" placeholder="Search">
+    <table>
+        <!-- Table headers -->
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>Actions</th>
+            </tr>
+         <tr>
+                <th>
+                     <input type="text" ng-model="filters.id">
+                </th>
+                <th>
+                     <input type="text" ng-model="filters.name">
+                </th>
+                <th>
+                    <input type="text" ng-model="filters.description">
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <!-- ... -->
+
+        <!-- Table body -->
+        <tbody>
+             <tr ng-repeat="product in paginatedProducts">
+                <td>{{ product.id }}</td>
+                <td contenteditable="true" ng-model="product.name">{{ product.name }}</td>
+                <td contenteditable="true" ng-model="product.description">{{ product.description }}</td>
+                <td>
+                    <button ng-click="deleteProduct(product)">Delete</button>
+                </td>
+            </tr>
+        <tr>
+                <td></td>
+                <td>
+            <input type="text" ng-model="newProduct.name" placeholder="Product Name">
+        </td>
+        <td>
+            <input type="text" ng-model="newProduct.description" placeholder="Description">
+        </td>
+                <td>
+                    <button ng-click="addProduct()">Add</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+        <div>
+            <button ng-disabled="currentPage === 1" ng-click="prevPage()">Previous</button>
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+            <button ng-disabled="currentPage === totalPages" ng-click="nextPage()">Next</button>
+        </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+        angular.module('ProductApp', [])
+        .controller('ProductController', function($scope, $http) {
+            // Initialize scope variables
+            $scope.currentPage = 1;
+            $scope.pageSize = 10; // Number of items per page
+            $scope.totalPages = 0;
+            $scope.paginatedProducts = [];
+            $scope.filters = {};
+            // Fetch calls function with pagination and filtering
+             $scope.fetchProducts = function() {
+                $http.get('../api/products/', {
+                        params: angular.extend({
+                        page: $scope.currentPage,
+                        page_size: $scope.pageSize
+                    }, $scope.filters)
+                })
+                .then(function(response) {
+                    $scope.paginatedProducts = response.data.results; // Assuming API returns results in a 'results' array
+                    $scope.totalPages = response.data.total_pages; // Modify based on actual API response
+                    const totalCount = response.data.count;
+                    $scope.totalPages = Math.ceil(totalCount / $scope.pageSize);
+                })
+                .catch(function(error) {
+                    console.error('Error fetching calls:', error);
+                });
+            };
+
+
+            // Function to add new product
+
+                // Function to delete product
+            $scope.deleteProduct = function (product) {
+                const productId = product.id; // Assuming 'id' is the identifier for the product
+                $http.delete(`../api/products/${productId}/`)
+                    .then(function (response) {
+                        // On success, refresh the product list
+                        $scope.fetchProducts();
+                    })
+                    .catch(function (error) {
+                        console.error('Error deleting product:', error);
+                        // Handle error scenarios
+                    });
+            };
+
+            // Initial fetch
+            $scope.fetchProducts($scope.currentPage);
+
+             $scope.prevPage = function() {
+                if ($scope.currentPage > 1) {
+                    $scope.currentPage--;
+                    $scope.fetchProducts();
+                }
+            };
+
+            // Function to navigate to the next page
+            $scope.nextPage = function() {
+                if ($scope.currentPage < $scope.totalPages) {
+                    $scope.currentPage++;
+                    $scope.fetchProducts();
+                }
+            };
+             $scope.$watch('filters', function(newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    $scope.fetchProducts();
+                }
+            }, true);
+
+            // Set current page
+            $scope.setPage = function(page) {
+                $scope.currentPage = page;
+                $scope.fetchProducts(page);
+            };
+
+            $scope.newProduct = {
+                name: '', // Default empty string for name
+                description: '', // Default empty string for description
+                // Other properties with default values if needed
+            };
+
+
+            $scope.addProduct = function () {
+                $http.post('../api/products/create/', $scope.newProduct)
+                    .then(function (response) {
+                        // On success, refresh the product list by re-fetching
+                        $scope.fetchProducts(); // Assuming fetchProducts() retrieves all calls again
+                        $scope.newProduct = {}; // Clear new product object
+                    })
+                    .catch(function (error) {
+                        console.error('Error adding product:', error);
+                        // Handle error scenarios
+                    });
+            };
+
+
+
+        });
+    </script>
+</div>
+{% endverbatim %}
+{% endblock %}

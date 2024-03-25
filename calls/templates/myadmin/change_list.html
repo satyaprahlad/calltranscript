@@ -1,0 +1,94 @@
+{# {% extends "admin/custom_change_list.html" %} #}
+{% extends 'search_admin_autocomplete_/change_list.html' %}
+{% load i18n static advanced_search_form %}
+
+
+{% block extrastyle %}
+    {{ block.super }}
+<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <!-- Include your AngularJS app scripts -->
+    <script src="{% static 'js/app.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+{% block extrahead %}
+    <!-- Include any additional CSS or JavaScript files here -->
+<!--    <link rel="stylesheet" type="text/css" href="{% static 'css/modal.css' %}">-->
+<!--    <script src="{% static 'js/modal.js' %}"></script>-->
+{% endblock %}
+{% block content %}
+    {{ block.super }}
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <iframe id="modal-iframe" src=""></iframe>
+    </div>
+</div>
+
+   <!-- Add this JavaScript code to the admin/change_list.html template -->
+<script>
+    function closeModal() {
+            var modal = document.getElementById('modal');
+            modal.style.display = 'none'; // Hide modal
+        }
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("great")
+        // Intercept click event on table rows
+        document.querySelectorAll(".results table tbody tr a").forEach(function(row) {
+            row.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default link behavior
+                var url = this.getAttribute('href'); // Get the URL of the change form
+                openModal(url); // Open modal window with the change form
+            });
+        });
+
+        // Function to open modal window with the change form
+        function openModal(url) {
+            var modal = document.getElementById('modal');
+            var iframe = document.getElementById('modal-iframe');
+            iframe.src = url; // Set iframe source
+            var iframeWindow = iframe.contentWindow;
+
+            // Add event listener to elements within the iframe
+            iframeWindow.document.addEventListener('DOMContentLoaded', function () {
+                console.log("in ifraem")
+                // Access elements within the iframe content
+                var iframeElement = iframeWindow.document.querySelector('.closelink')
+                console.log("in iframe event")
+                // Add event listener to the element
+                iframeElement.addEventListener('click', function (event) {
+                    console.log('in iframe close');
+                    event.preventDefault()
+                    closeModal();
+                });
+            });
+
+            modal.style.display = 'block'; // Show modal
+        }
+
+
+
+
+
+// Close modal when close button is clicked
+        document.querySelector('.close').addEventListener('click', function () {
+            closeModal();
+        });
+
+
+
+
+    });
+</script>
+
+{% endblock %}
+
+{% block object-tools-items %}
+<!--  <li><a href="?date_filter=10">10 days old</a></li>-->
+<!--  <li><a href="?date_filter=30">30 days old</a></li>-->
+{{ block.super}}
+
+
+{% endblock %}
+
+

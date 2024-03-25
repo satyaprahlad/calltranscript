@@ -1,0 +1,33 @@
+{% extends 'admin/index.html' %}
+{% load i18n static %}
+{% block extrastyle %}
+    {{ block.super }}
+    <!-- Add any additional stylesheets here -->
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <!-- Include jQuery from CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <!-- Include your AngularJS app scripts -->
+    <script src="{% static 'js/app.js' %}"></script>
+
+    <!-- Your custom jQuery code -->
+    <script>
+        $(document).ready(function() {
+            // Your jQuery code here
+            // Example: alert when the document is ready
+            console.log("jQuery is working in newadmin!");
+        });
+    </script>
+{% endblock %}
+{% block welcome-msg %}
+    {{ block.super }}
+                {% translate 'Have fun' %}
+
+{% endblock %}
+{% block branding %}
+    {{ block.super }}
+    <!-- Customize branding/header if needed -->
+{% endblock %}
