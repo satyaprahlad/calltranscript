@@ -1,0 +1,23 @@
+/* Change background color of the entire admin interface */
+body {
+    background-color: #f0f0f0;
+}
+
+/* Change color of the sidebar */
+.sidebar {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Change color of the main content area */
+.content {
+    background-color: #fff;
+    color: #333;
+}
+
+/* Change color of links */
+a {
+    color: #007bff;
+}
+
+/* Add more custom styles as needed */

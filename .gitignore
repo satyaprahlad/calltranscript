@@ -1,4 +1,5 @@
 *.log
 logs/
 venv/
-static/
+/static/
+__pycache__/
